@@ -1,0 +1,19 @@
+---
+title: "case_study"
+output: github_document
+---
+
+
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+
+data(nyc_airbnb)
+```
+
+## some questions
+
+most expensive / cheapest
+highest concentration
+most / best review
+number increased / descreased over time
