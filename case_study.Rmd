@@ -105,3 +105,24 @@ nyc_airbnb |>
   )
 ```
 
+##leaflet map
+
+```{r}
+library(leaflet)
+
+pal = colorNumeric(
+  palette = "viridis",
+  domain = 1 : 500
+)
+
+nyc_airbnb |>
+  filter(neighbourhood_group == "Manhattan") |>
+  filter(room_type == "Entire home/apt") |>
+  filter(price < 500) |>
+  sample_n(50) |>
+  leaflet() |>
+  addTiles() |>
+  addCircleMarkers(~lat, ~long,color = ~pal(price), radius = 0.5)
+
+```
+
