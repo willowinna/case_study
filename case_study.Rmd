@@ -8,7 +8,7 @@ output: github_document
 library(tidyverse)
 library(p8105.datasets)
 
-data(nyc_airbnb)
+data("nyc_airbnb")
 ```
 
 ## some questions
@@ -17,3 +17,91 @@ most expensive / cheapest
 highest concentration
 most / best review
 number increased / descreased over time
+
+```{r}
+nyc_airbnb |>
+  count(room_type, neighbourhood_group) |>
+  pivot_wider(
+    names_from = room_type,
+    values_from = n
+  )
+```
+
+```{r}
+nyc_airbnb |>
+  filter(neighbourhood_group == "Manhattan") |>
+  count(room_type, neighbourhood) |>
+  pivot_wider(
+    names_from = room_type,
+    values_from = n
+  )
+```
+
+##price
+
+```{r}
+nyc_airbnb |>
+  mutate(price_rank = min_rank(price)) |>
+  filter(price_rank < 3)
+```
+
+```{r}
+nyc_airbnb |>
+  group_by(neighbourhood_group) |>
+  mutate(price_rank = min_rank(desc(price))) |>
+  filter(price_rank < 10)
+```
+
+
+
+```{r}
+nyc_airbnb |>
+  filter(price < 1000) |>
+  ggplot(aes(x = price)) +
+  geom_histogram() +
+  facet_grid(room_type ~ neighbourhood_group)
+  
+```
+
+
+price average
+
+```{r}
+nyc_airbnb |>
+  group_by(room_type, neighbourhood_group) |>
+  summarize(
+    mean_price = mean(price)
+  ) |>
+  pivot_wider(
+    names_from = room_type,
+    values_from = mean_price
+  )
+  
+```
+
+```{r}
+nyc_airbnb |>
+  filter(neighbourhood_group == "Manhattan") |>
+  filter(price < 500) |>
+  filter(room_type != "Shared room") |>
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) |>
+  ggplot(aes(x = neighbourhood, y = price)) + 
+  geom_boxplot() +
+  facet_grid(. ~ room_type) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+##visualize price some more
+map
+```{r}
+nyc_airbnb |>
+  filter(neighbourhood_group == "Manhattan") |>
+  filter(room_type == "Entire home/apt") |>
+  filter(price < 500) |>
+  ggplot(aes(x = lat, y = long, col = price)) +
+  geom_point(alpha = 0.5) + 
+  viridis::scale_color_viridis(
+    name = "price"
+  )
+```
+
